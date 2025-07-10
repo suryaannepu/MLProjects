@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Exam Performance Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Modern Glassmorphism UI Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 40px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            animation: fadeIn 0.6s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, #e6e6e6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+
+        select:hover, input[type="number"]:hover,
+        select:focus, input[type="number"]:focus {
+            background-color: rgba(255,255,255,0.3);
+            outline: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        option {
+            color: #333;
+            background: #fff;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 10px;
+            background: linear-gradient(to right, #fff, #c9d6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 25px;
+                border-radius: 16px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+            
+            select, input[type="number"] {
+                padding: 12px;
+            }
+            
+            .btn {
+                padding: 14px;
+                font-size: 16px;
+            }
+        }
+
+        /* Floating bubbles background effect */
+        .bubbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: rise 15s infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: -100px;
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(100px);
+            }
+            100% {
+                bottom: 100vh;
+                transform: translateX(-200px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background bubbles -->
+    <div class="bubbles">
+        <div class="bubble" style="width: 40px; height: 40px; left: 10%; animation-delay: 0s;"></div>
+        <div class="bubble" style="width: 20px; height: 20px; left: 20%; animation-delay: 2s;"></div>
+        <div class="bubble" style="width: 50px; height: 50px; left: 35%; animation-delay: 4s;"></div>
+        <div class="bubble" style="width: 80px; height: 80px; left: 50%; animation-delay: 0s;"></div>
+        <div class="bubble" style="width: 35px; height: 35px; left: 55%; animation-delay: 7s;"></div>
+        <div class="bubble" style="width: 45px; height: 45px; left: 65%; animation-delay: 3s;"></div>
+        <div class="bubble" style="width: 90px; height: 90px; left: 70%; animation-delay: 5s;"></div>
+        <div class="bubble" style="width: 25px; height: 25px; left: 80%; animation-delay: 1s;"></div>
+        <div class="bubble" style="width: 15px; height: 15px; left: 70%; animation-delay: 6s;"></div>
+        <div class="bubble" style="width: 60px; height: 60px; left: 85%; animation-delay: 8s;"></div>
+    </div>
+
+    <div class="container">
+        <h1> 📝 Student Exam Performance Predictor</h1>
+        <form action="{{ url_for('predict_datapoint') }}" method="POST">
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select name="gender" id="gender" required>
+                    <option value="" disabled selected>Select your Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="ethnicity">Race or Ethnicity</label>
+                <select name="ethnicity" id="ethnicity" required>
+                    <option value="" disabled selected>Select Ethnicity</option>
+                    <option value="group A">Group A</option>
+                    <option value="group B">Group B</option>
+                    <option value="group C">Group C</option>
+                    <option value="group D">Group D</option>
+                    <option value="group E">Group E</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="parental_level_of_education">Parental Education</label>
+                <select name="parental_level_of_education" id="parental_level_of_education" required>
+                    <option value="" disabled selected>Select Parent Education</option>
+                    <option value="associate's degree">Associate's degree</option>
+                    <option value="bachelor's degree">Bachelor's degree</option>
+                    <option value="high school">High school</option>
+                    <option value="master's degree">Master's degree</option>
+                    <option value="some college">Some college</option>
+                    <option value="some high school">Some high school</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="lunch">Lunch Type</label>
+                <select name="lunch" id="lunch" required>
+                    <option value="" disabled selected>Select Lunch Type</option>
+                    <option value="free/reduced">Free/Reduced</option>
+                    <option value="standard">Standard</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="test_preparation_course">Test Preparation</label>
+                <select name="test_preparation_course" id="test_preparation_course" required>
+                    <option value="" disabled selected>Select Test Preparation</option>
+                    <option value="none">None</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="reading_score">Reading Score (0-100)</label>
+                <input type="number" name="reading_score" id="reading_score" min="0" max="100" 
+                       placeholder="Enter Reading Score" required>
+            </div>
+
+            <div class="form-group">
+                <label for="writing_score">Writing Score (0-100)</label>
+                <input type="number" name="writing_score" id="writing_score" min="0" max="100" 
+                       placeholder="Enter Writing Score" required>
+            </div>
+
+            <button type="submit" class="btn">
+                <span>Predict Math Score</span> 🎯
+            </button>
+        </form>
+
+        {% if results %}
+        <div class="result-container">
+            <div>Predicted Math Score</div>
+            <div class="result-value">{{ results }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Enhanced form interactions
+        document.querySelectorAll('select, input').forEach(el => {
+            // Add focus class for better accessibility
+            el.addEventListener('focus', () => {
+                el.parentElement.style.transform = 'scale(1.01)';
+            });
+            
+            el.addEventListener('blur', () => {
+                el.parentElement.style.transform = 'scale(1)';
+            });
+            
+            // Add ripple effect to form elements
+            el.addEventListener('mousedown', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    </script>
+</body>
+</html>
